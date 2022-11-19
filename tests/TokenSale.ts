@@ -105,15 +105,14 @@ describe("NFT Shop", async () => {
         // Implementing pull over push pattern
         const allowTx = await paymentTokenContract.connect(accounts[1]).approve(tokenSaleContract.address,ETH_SENT.div(Token_ETH_RATIO));
         const receiptAllow = await allowTx.wait();
+        const gasCostAllow = (receiptAllow.gasUsed).mul(receiptAllow.effectiveGasPrice);
 
         const burnTx =await tokenSaleContract.connect(accounts[1]).burnTokens(ETH_SENT.div(Token_ETH_RATIO));
         const receiptBurn = await burnTx.wait();
+        const gasCostBurn = (receiptBurn.gasUsed).mul(receiptBurn.effectiveGasPrice);
 
-        const gasCostAllow = receiptAllow.gasUsed.mul(receiptAllow.effectiveGasPrice)
-        const gasCostBurn = receiptBurn.gasUsed.mul(receiptBurn.effectiveGasPrice)
         gasCost = gasCostAllow.add(gasCostBurn);
 
-        balanceAfter = await accounts[1].getBalance()
         //const tx = await paymentTokenContract.connect(accounts[1]).transfer(tokenSaleContract.address, ETH_SENT.div(Token_ETH_RATIO));
         //const receipt = await tx.wait();
       });
@@ -121,9 +120,8 @@ describe("NFT Shop", async () => {
       it("gives the correct amount of ETH", async () => {
         //const balanceAfterBurn = await paymentTokenContract.connect(accounts[1]).balanceOf(tokenSaleContract.address);
         const balanceAfterBurn = await accounts[1].getBalance();
-
         console.log(balanceAfterBurn)
-        const expectedBalance = balanceAfterBurn.sub(gasCost).add(ETH_SENT);
+        const expectedBalance = balanceAfter.sub(gasCost).add(ETH_SENT);
         const error = expectedBalance.sub(balanceAfterBurn);
         expect (error).to.eq(0);
       });
@@ -132,14 +130,12 @@ describe("NFT Shop", async () => {
         const balanceBN= await paymentTokenContract.connect(accounts[1]).balanceOf(tokenSaleContract.address);
         expect(balanceBN).to.eq(0);
       });
-
-   
- 
+    });
 
     describe("When a user purchase a NFT from the Shop contract", async () => {
       const NFT_ID = 42;
       let TokenBalanceBefore: BigNumber;
-      beforeEach(async =>{
+      beforeEach(async () => {
         //const nftOwnerBeforeTx = await nftContract.ownerOf(NFT_ID);
         //console.log(nftOwnerBeforeTx) fails as it's not yet minted
         TokenBalanceBefore = await paymentTokenContract.balanceOf(accounts[1].address);
@@ -172,27 +168,24 @@ describe("NFT Shop", async () => {
       });
     });
   });
+  
+  describe("When a user burns their NFT at the Shop contract", async () => {
+    it("gives the correct amount of ERC20 tokens", async () => {
+      throw new Error("Not implemented");
+    });
+    it("updates the pool correctly", async () => {
+      throw new Error("Not implemented");
+    });
+  });
 
-    describe("When a user burns their NFT at the Shop contract", async () => {
-      it("gives the correct amount of ERC20 tokens", async () => {
-        throw new Error("Not implemented");
-      });
-      it("updates the pool correctly", async () => {
-        throw new Error("Not implemented");
-      });
+  describe("When the owner withdraw from the Shop contract", async () => {
+    it("recovers the right amount of ERC20 tokens", async () => {
+      throw new Error("Not implemented");
     });
 
-    describe("When the owner withdraw from the Shop contract", async () => {
-      it("recovers the right amount of ERC20 tokens", async () => {
-        throw new Error("Not implemented");
-      });
-
-      it("updates the owner account correctly", async () => {
-        throw new Error("Not implemented");
-      });
+    it("updates the owner account correctly", async () => {
+      throw new Error("Not implemented");
     });
-
-});
-
+  });
   
 });
